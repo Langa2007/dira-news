@@ -84,19 +84,29 @@ Latest verified checks:
 
 ## Phase 2: Source Acquisition Workers
 
-Status: Not started
+Status: Done
 
-- [ ] Python worker folder
-- [ ] RSS ingestion
-- [ ] Static page extraction
-- [ ] Rendered page extraction
-- [ ] robots.txt checks
-- [ ] Per-domain rate limiting
-- [ ] Source fetch status updates
-- [ ] Source document storage
-- [ ] Duplicate detection
-- [ ] Text hashing
-- [ ] Crawl logs
+- [x] Python worker folder
+- [x] RSS ingestion
+- [x] Static page extraction
+- [x] Rendered page extraction interface
+- [x] robots.txt checks
+- [x] Per-domain rate limiting
+- [x] Source fetch status payloads
+- [x] Source fetch status backend endpoint
+- [x] Source document payloads
+- [x] Source document backend client
+- [x] Duplicate detection
+- [x] Text hashing
+- [x] Crawl logs
+- [x] Test fixtures
+- [x] Automated tests
+- [x] Verification output captured
+
+Latest verified checks:
+
+- `python -m unittest discover -s python/acquisition/tests -p "test_*.py"`: passed, 8 tests.
+- Recursive backend JavaScript syntax check after adding source fetch status endpoint: passed.
 
 ## Phase 3: AI And ML Core
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Dira Fixture Feed</title>
+    <item>
+      <title>Local Council Approves New Health Center</title>
+      <link>https://example.com/local/health-center?utm_source=social</link>
+      <description>Officials confirmed the project after a public meeting.</description>
+      <pubDate>Fri, 05 Jun 2026 09:00:00 GMT</pubDate>
+      <author>Fixture Reporter</author>
+    </item>
+    <item>
+      <title>World Markets Open Higher</title>
+      <link>https://example.com/world/markets</link>
+      <description>Investors reacted to new economic data.</description>
+      <pubDate>Fri, 05 Jun 2026 10:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
+

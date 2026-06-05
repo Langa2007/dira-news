@@ -26,6 +26,14 @@ const sourceDocumentSchema = z.object({
   metadata: z.record(z.unknown()).optional()
 });
 
+const fetchStatusSchema = z.object({
+  status: z.enum(['QUEUED', 'RUNNING', 'SUCCESS', 'FAILED', 'SKIPPED', 'BLOCKED']),
+  httpStatus: z.number().int().optional(),
+  error: z.string().max(2000).optional(),
+  startedAt: z.string().datetime().optional(),
+  finishedAt: z.string().datetime().optional()
+});
+
 async function listSources(req, res) {
   const sources = await prisma.source.findMany({
     orderBy: { createdAt: 'desc' },
@@ -127,10 +135,35 @@ async function createSourceDocument(req, res) {
   res.status(201).json({ document });
 }
 
+async function updateSourceFetchStatus(req, res) {
+  const input = fetchStatusSchema.parse(req.body);
+  const fetch = await prisma.sourceFetch.update({
+    where: { id: req.params.id },
+    data: {
+      status: input.status,
+      httpStatus: input.httpStatus,
+      error: input.error,
+      startedAt: input.startedAt ? new Date(input.startedAt) : undefined,
+      finishedAt: input.finishedAt ? new Date(input.finishedAt) : undefined
+    }
+  });
+
+  await recordAudit({
+    actorId: req.user.id,
+    action: 'source.fetch.update',
+    entity: 'SourceFetch',
+    entityId: fetch.id,
+    metadata: { status: fetch.status }
+  });
+
+  res.json({ fetch });
+}
+
 export {
   listSources,
   createSource,
   queueSourceFetch,
   listSourceDocuments,
-  createSourceDocument
+  createSourceDocument,
+  updateSourceFetchStatus
 };

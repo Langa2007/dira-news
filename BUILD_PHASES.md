@@ -111,6 +111,8 @@ Output:
 
 ## Phase 2: Source Acquisition Workers
 
+Status: Done
+
 Goal: build Python workers that gather information from allowed sources.
 
 Tech:
@@ -125,16 +127,21 @@ Tech:
 
 Build:
 
-- RSS ingestion
-- static page extraction
-- rendered page extraction
-- robots.txt checks
-- per-domain rate limits
-- source fetch status updates
-- source document storage
-- duplicate detection
-- text hashing
-- crawl logs
+- [x] Python worker folder
+- [x] RSS ingestion
+- [x] static page extraction
+- [x] rendered page extraction interface
+- [x] robots.txt checks
+- [x] per-domain rate limits
+- [x] source fetch status payloads
+- [x] source fetch status backend endpoint
+- [x] source document payloads
+- [x] source document backend client
+- [x] duplicate detection
+- [x] text hashing
+- [x] crawl logs
+- [x] fixture-based test suite
+- [x] verification output captured
 
 ## Phase 3: AI And ML Core
 

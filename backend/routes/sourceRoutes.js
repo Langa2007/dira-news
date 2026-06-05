@@ -6,7 +6,8 @@ import {
   createSourceDocument,
   listSourceDocuments,
   listSources,
-  queueSourceFetch
+  queueSourceFetch,
+  updateSourceFetchStatus
 } from '../controllers/sourceController.js';
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/documents', requireAuth, requireRole('admin', 'editor', 'editor_in_
 router.post('/', requireAuth, requireRole('admin', 'editor_in_chief'), asyncHandler(createSource));
 router.post('/:id/fetch', requireAuth, requireRole('admin', 'editor_in_chief'), asyncHandler(queueSourceFetch));
 router.post('/:id/documents', requireAuth, requireRole('admin', 'editor_in_chief'), asyncHandler(createSourceDocument));
+router.patch('/fetches/:id', requireAuth, requireRole('admin', 'editor_in_chief'), asyncHandler(updateSourceFetchStatus));
 
 export default router;
