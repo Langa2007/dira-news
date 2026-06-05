@@ -145,23 +145,29 @@ Build:
 
 ## Phase 3: AI And ML Core
 
+Status: Done
+
 Goal: turn source documents into structured story intelligence.
 
 Build:
 
-- entity extraction
-- claim extraction
-- fact table generation
-- source comparison
-- contradiction detection
-- story clustering
-- hotness scoring
-- local relevance scoring
-- world relevance scoring
-- similarity/plagiarism-risk checks
-- AI output audit records
-- original article draft generation
-- social phrase generation
+- [x] AI provider adapter
+- [x] entity extraction
+- [x] claim extraction
+- [x] fact table generation
+- [x] source comparison
+- [x] contradiction detection
+- [x] story clustering
+- [x] hotness scoring
+- [x] local relevance scoring
+- [x] world relevance scoring
+- [x] similarity/plagiarism-risk checks
+- [x] backend-compatible AI output records
+- [x] original article draft generation
+- [x] social phrase generation
+- [x] AI pipeline orchestration
+- [x] fixture-based test suite
+- [x] verification output captured
 
 ## Phase 4: Recommendation Algorithm
 

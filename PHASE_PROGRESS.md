@@ -110,16 +110,29 @@ Latest verified checks:
 
 ## Phase 3: AI And ML Core
 
-Status: Not started
+Status: Done
 
-- [ ] AI provider adapter
-- [ ] Entity extraction
-- [ ] Claim extraction
-- [ ] Fact table generation
-- [ ] Source comparison
-- [ ] Contradiction detection
-- [ ] Story clustering jobs
-- [ ] Hotness scoring jobs
-- [ ] Similarity/plagiarism-risk checks
-- [ ] Original draft generation
-- [ ] Social phrase generation
+- [x] AI provider adapter
+- [x] Entity extraction
+- [x] Claim extraction
+- [x] Fact table generation
+- [x] Source comparison
+- [x] Contradiction detection
+- [x] Story clustering jobs
+- [x] Hotness scoring jobs
+- [x] Local relevance scoring
+- [x] World relevance scoring
+- [x] Similarity/plagiarism-risk checks
+- [x] Original draft generation
+- [x] Social phrase generation
+- [x] Backend-compatible AI output records
+- [x] AI pipeline orchestration
+- [x] Test fixtures
+- [x] Automated tests
+- [x] Verification output captured
+
+Latest verified checks:
+
+- `python -m unittest discover -s python/ai_core/tests -p "test_*.py"`: passed, 7 tests.
+- `python -m unittest discover -s python/acquisition/tests -p "test_*.py"`: passed, 8 tests.
+- Recursive backend JavaScript syntax check: passed.
