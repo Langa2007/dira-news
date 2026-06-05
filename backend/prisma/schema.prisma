@@ -1,0 +1,523 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum SourceType {
+  RSS
+  API
+  STATIC_PAGE
+  RENDERED_PAGE
+  SOCIAL_PUBLIC
+  DATASET
+  PRESS_RELEASE
+  LICENSED_FEED
+}
+
+enum SourceStatus {
+  ACTIVE
+  PAUSED
+  BLOCKED
+  TAKEDOWN
+}
+
+enum FetchStatus {
+  QUEUED
+  RUNNING
+  SUCCESS
+  FAILED
+  SKIPPED
+  BLOCKED
+}
+
+enum CategorySlug {
+  LOCAL
+  WORLD
+  POLITICS
+  BUSINESS
+  TECHNOLOGY
+  SPORTS
+  ENTERTAINMENT
+  HEALTH
+  EDUCATION
+  OPINION
+}
+
+enum StoryClusterStatus {
+  CANDIDATE
+  REVIEWING
+  APPROVED
+  DISMISSED
+  MERGED
+}
+
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+  CORRECTED
+}
+
+enum MediaLicenseStatus {
+  UNKNOWN
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum PublishTargetType {
+  WEBSITE
+  APP_FEED
+  TELEGRAM
+  WHATSAPP_DRAFT
+  INSTAGRAM_DRAFT
+  X_DRAFT
+  RSS
+  SITEMAP
+}
+
+enum PublishStatus {
+  QUEUED
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+enum AiOutputType {
+  ENTITY_EXTRACTION
+  CLAIM_EXTRACTION
+  STORY_CLUSTER_SUMMARY
+  FACT_TABLE
+  ARTICLE_OUTLINE
+  ARTICLE_DRAFT
+  HEADLINE_OPTIONS
+  SEO_METADATA
+  TELEGRAM_CAPTION
+  WHATSAPP_HOOK
+  X_DRAFT
+  INSTAGRAM_CAPTION
+  BIAS_SCAN
+  SIMILARITY_SCAN
+  CONTRADICTION_SCAN
+}
+
+enum UserEventType {
+  ARTICLE_OPEN
+  READ_DEPTH
+  SAVE
+  SHARE
+  SEARCH
+  NOTIFICATION_CLICK
+  HIDE_TOPIC
+  FOLLOW_TOPIC
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  name                  String?
+  passwordHash          String?
+  status                UserStatus             @default(ACTIVE)
+  emailVerifiedAt       DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  roles                 UserRole[]
+  preferences           UserPreference[]
+  events                UserEvent[]
+  articlesAuthored      Article[]              @relation("ArticleAuthor")
+  articlesEdited        Article[]              @relation("ArticleEditor")
+  editorialReviews      EditorialReview[]
+  auditLogs             AuditLog[]
+  recommendationProfile RecommendationProfile?
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  name        String
+  description String?
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  description String?
+  roles       RolePermission[]
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Topic {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  description String?
+  category    CategorySlug?
+  createdAt   DateTime         @default(now())
+  preferences UserPreference[]
+  articles    ArticleTopic[]
+  events      UserEvent[]
+}
+
+model Region {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  countryCode String?
+  parentId    String?
+  parent      Region?          @relation("RegionTree", fields: [parentId], references: [id])
+  children    Region[]         @relation("RegionTree")
+  sources     Source[]
+  articles    Article[]
+  preferences UserPreference[]
+}
+
+model UserPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  topicId   String?
+  regionId  String?
+  weight    Float    @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  region    Region?  @relation(fields: [regionId], references: [id])
+  topic     Topic?   @relation(fields: [topicId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Source {
+  id                String           @id @default(cuid())
+  name              String
+  type              SourceType
+  status            SourceStatus     @default(ACTIVE)
+  homepageUrl       String?
+  feedUrl           String?
+  apiUrl            String?
+  regionId          String?
+  category          CategorySlug?
+  credibilityScore  Float            @default(0.5)
+  crawlIntervalMins Int              @default(60)
+  robotsAllowed     Boolean?
+  termsNotes        String?
+  takedownRequested Boolean          @default(false)
+  lastFetchedAt     DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  region            Region?          @relation(fields: [regionId], references: [id])
+  fetches           SourceFetch[]
+  documents         SourceDocument[]
+
+  @@index([status, type])
+  @@index([category])
+}
+
+model SourceFetch {
+  id         String           @id @default(cuid())
+  sourceId   String
+  status     FetchStatus      @default(QUEUED)
+  url        String
+  reason     String?
+  httpStatus Int?
+  error      String?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime         @default(now())
+  source     Source           @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  documents  SourceDocument[]
+}
+
+model SourceDocument {
+  id            String               @id @default(cuid())
+  sourceId      String
+  fetchId       String?
+  canonicalUrl  String?
+  title         String
+  author        String?
+  publishedAt   DateTime?
+  extractedText String?
+  textHash      String?
+  metadata      Json?
+  createdAt     DateTime             @default(now())
+  source        Source               @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  fetch         SourceFetch?         @relation(fields: [fetchId], references: [id])
+  clusterLinks  StoryClusterSource[]
+  claims        Claim[]
+
+  @@index([sourceId, createdAt])
+  @@index([canonicalUrl])
+  @@index([textHash])
+}
+
+model StoryCluster {
+  id              String               @id @default(cuid())
+  title           String
+  summary         String?
+  status          StoryClusterStatus   @default(CANDIDATE)
+  category        CategorySlug?
+  localScore      Float                @default(0)
+  worldScore      Float                @default(0)
+  hotnessScore    Float                @default(0)
+  confidenceScore Float                @default(0)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  sources         StoryClusterSource[]
+  articles        Article[]
+  aiOutputs       AiOutput[]
+}
+
+model StoryClusterSource {
+  clusterId  String
+  documentId String
+  confidence Float          @default(0.5)
+  createdAt  DateTime       @default(now())
+  cluster    StoryCluster   @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  document   SourceDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@id([clusterId, documentId])
+}
+
+model Claim {
+  id         String          @id @default(cuid())
+  documentId String?
+  articleId  String?
+  text       String
+  status     String          @default("UNREVIEWED")
+  confidence Float           @default(0)
+  metadata   Json?
+  createdAt  DateTime        @default(now())
+  document   SourceDocument? @relation(fields: [documentId], references: [id])
+  article    Article?        @relation(fields: [articleId], references: [id])
+}
+
+model Article {
+  id             String            @id @default(cuid())
+  slug           String            @unique
+  title          String
+  subtitle       String?
+  status         ArticleStatus     @default(DRAFT)
+  category       CategorySlug
+  regionId       String?
+  authorId       String?
+  editorId       String?
+  clusterId      String?
+  body           String?
+  summary        String?
+  seoTitle       String?
+  seoDescription String?
+  isBreaking     Boolean           @default(false)
+  publishedAt    DateTime?
+  scheduledAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  author         User?             @relation("ArticleAuthor", fields: [authorId], references: [id])
+  editor         User?             @relation("ArticleEditor", fields: [editorId], references: [id])
+  region         Region?           @relation(fields: [regionId], references: [id])
+  cluster        StoryCluster?     @relation(fields: [clusterId], references: [id])
+  versions       ArticleVersion[]
+  topics         ArticleTopic[]
+  media          ArticleMedia[]
+  claims         Claim[]
+  reviews        EditorialReview[]
+  publishTargets PublishTarget[]
+  socialDrafts   SocialDraft[]
+  aiOutputs      AiOutput[]
+
+  @@index([status, category, publishedAt])
+  @@index([isBreaking, publishedAt])
+}
+
+model ArticleVersion {
+  id        String   @id @default(cuid())
+  articleId String
+  version   Int
+  title     String
+  body      String?
+  summary   String?
+  editorId  String?
+  createdAt DateTime @default(now())
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, version])
+}
+
+model ArticleTopic {
+  articleId String
+  topicId   String
+  weight    Float   @default(1)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  topic     Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, topicId])
+}
+
+model MediaAsset {
+  id            String             @id @default(cuid())
+  url           String
+  storageKey    String?
+  title         String?
+  altText       String?
+  sourceUrl     String?
+  owner         String?
+  licenseType   String?
+  attribution   String?
+  licenseStatus MediaLicenseStatus @default(NEEDS_REVIEW)
+  metadata      Json?
+  createdAt     DateTime           @default(now())
+  articles      ArticleMedia[]
+}
+
+model ArticleMedia {
+  articleId String
+  mediaId   String
+  role      String     @default("BODY")
+  sortOrder Int        @default(0)
+  article   Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, mediaId, role])
+}
+
+model EditorialReview {
+  id         String   @id @default(cuid())
+  articleId  String
+  reviewerId String
+  status     String
+  notes      String?
+  createdAt  DateTime @default(now())
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+}
+
+model PublishTarget {
+  id          String            @id @default(cuid())
+  articleId   String
+  type        PublishTargetType
+  status      PublishStatus     @default(QUEUED)
+  externalId  String?
+  payload     Json?
+  error       String?
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  article     Article           @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([type, status])
+}
+
+model SocialDraft {
+  id        String            @id @default(cuid())
+  articleId String?
+  target    PublishTargetType
+  text      String
+  status    String            @default("DRAFT")
+  metadata  Json?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  article   Article?          @relation(fields: [articleId], references: [id])
+}
+
+model AiOutput {
+  id         String       @id @default(cuid())
+  type       AiOutputType
+  provider   String
+  model      String
+  promptKey  String?
+  promptHash String?
+  input      Json
+  output     Json
+  score      Float?
+  clusterId  String?
+  articleId  String?
+  createdAt  DateTime     @default(now())
+  cluster    StoryCluster? @relation(fields: [clusterId], references: [id])
+  article    Article?      @relation(fields: [articleId], references: [id])
+}
+
+model UserEvent {
+  id        String        @id @default(cuid())
+  userId    String
+  type      UserEventType
+  articleId String?
+  topicId   String?
+  value     Float?
+  metadata  Json?
+  createdAt DateTime      @default(now())
+  topic     Topic?        @relation(fields: [topicId], references: [id])
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+}
+
+model RecommendationProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  topicWeights    Json
+  regionWeights   Json?
+  lastRefreshedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  title     String
+  body      String?
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+}
+
