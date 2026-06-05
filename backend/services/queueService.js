@@ -9,27 +9,35 @@ const QUEUE_NAMES = {
   RECOMMENDATIONS: 'recommendations'
 };
 
-const connection = new IORedis(env.REDIS_URL, {
-  maxRetriesPerRequest: null
-});
+let connection;
+const queues = {};
 
-const queues = Object.fromEntries(
-  Object.values(QUEUE_NAMES).map((name) => [
-    name,
-    new Queue(name, {
-      connection
-    })
-  ])
-);
+function getConnection() {
+  if (!connection) {
+    connection = new IORedis(env.REDIS_URL, {
+      maxRetriesPerRequest: null
+    });
+  }
 
-async function addJob(queueName, jobName, data) {
-  const queue = queues[queueName];
+  return connection;
+}
 
-  if (!queue) {
+function getQueue(queueName) {
+  if (!Object.values(QUEUE_NAMES).includes(queueName)) {
     throw new Error(`Unknown queue: ${queueName}`);
   }
 
-  return queue.add(jobName, data, {
+  if (!queues[queueName]) {
+    queues[queueName] = new Queue(queueName, {
+      connection: getConnection()
+    });
+  }
+
+  return queues[queueName];
+}
+
+async function addJob(queueName, jobName, data) {
+  return getQueue(queueName).add(jobName, data, {
     attempts: 3,
     backoff: {
       type: 'exponential',
@@ -40,4 +48,4 @@ async function addJob(queueName, jobName, data) {
   });
 }
 
-export { QUEUE_NAMES, addJob };
+export { QUEUE_NAMES, addJob, getQueue };

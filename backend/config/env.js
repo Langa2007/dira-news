@@ -8,11 +8,21 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const required = ['DATABASE_URL', 'REDIS_URL', 'JWT_ACCESS_SECRET'];
+const isProduction = process.env.NODE_ENV === 'production';
+const required = ['DATABASE_URL'];
+
+if (isProduction) {
+  required.push('REDIS_URL', 'JWT_ACCESS_SECRET');
+}
+
 const missing = required.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {
   throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+}
+
+if (!isProduction && !process.env.JWT_ACCESS_SECRET) {
+  console.warn('JWT_ACCESS_SECRET is missing. Using a development-only fallback secret.');
 }
 
 const env = {
@@ -20,8 +30,8 @@ const env = {
   PORT: Number(process.env.PORT || 4000),
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
   DATABASE_URL: process.env.DATABASE_URL,
-  REDIS_URL: process.env.REDIS_URL,
-  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
+  REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
+  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'development-only-change-me',
   JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
   S3_ENDPOINT: process.env.S3_ENDPOINT,
   S3_REGION: process.env.S3_REGION || 'us-east-1',

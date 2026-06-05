@@ -136,6 +136,8 @@ Health check:
 GET /api/health
 ```
 
+Build progress is tracked in `PHASE_PROGRESS.md`. A phase is complete only after every item in that phase is marked done and verified without known errors.
+
 ## Environment
 
 Use `backend/.env.example` as the backend environment template.

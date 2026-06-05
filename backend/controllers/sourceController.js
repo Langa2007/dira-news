@@ -16,6 +16,16 @@ const sourceSchema = z.object({
   termsNotes: z.string().max(1000).optional()
 });
 
+const sourceDocumentSchema = z.object({
+  canonicalUrl: z.string().url().optional(),
+  title: z.string().min(1).max(500),
+  author: z.string().max(200).optional(),
+  publishedAt: z.string().datetime().optional(),
+  extractedText: z.string().optional(),
+  textHash: z.string().max(128).optional(),
+  metadata: z.record(z.unknown()).optional()
+});
+
 async function listSources(req, res) {
   const sources = await prisma.source.findMany({
     orderBy: { createdAt: 'desc' },
@@ -70,4 +80,57 @@ async function queueSourceFetch(req, res) {
   res.status(202).json({ fetch, jobId: job.id });
 }
 
-export { listSources, createSource, queueSourceFetch };
+async function listSourceDocuments(req, res) {
+  const documents = await prisma.sourceDocument.findMany({
+    where: {
+      ...(req.query.sourceId ? { sourceId: req.query.sourceId } : {})
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+    include: {
+      source: true
+    }
+  });
+
+  res.json({ documents });
+}
+
+async function createSourceDocument(req, res) {
+  const input = sourceDocumentSchema.parse(req.body);
+  const source = await prisma.source.findUnique({ where: { id: req.params.id } });
+
+  if (!source) {
+    return res.status(404).json({ error: { message: 'Source not found', statusCode: 404 } });
+  }
+
+  const document = await prisma.sourceDocument.create({
+    data: {
+      sourceId: source.id,
+      canonicalUrl: input.canonicalUrl,
+      title: input.title,
+      author: input.author,
+      publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
+      extractedText: input.extractedText,
+      textHash: input.textHash,
+      metadata: input.metadata
+    }
+  });
+
+  await recordAudit({
+    actorId: req.user.id,
+    action: 'source.document.create',
+    entity: 'SourceDocument',
+    entityId: document.id,
+    metadata: { sourceId: source.id }
+  });
+
+  res.status(201).json({ document });
+}
+
+export {
+  listSources,
+  createSource,
+  queueSourceFetch,
+  listSourceDocuments,
+  createSourceDocument
+};
