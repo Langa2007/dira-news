@@ -3,6 +3,7 @@ import prisma from '../models/prisma.js';
 import { recordAudit } from '../services/auditService.js';
 import { emitRealtime } from '../services/realtimeService.js';
 import { addJob, QUEUE_NAMES } from '../services/queueService.js';
+import { validateArticleMediaLicenses } from '../services/editorialService.js';
 import { getRankedHotNews } from '../services/recommendationService.js';
 import { makeSlug } from '../utils/slug.js';
 
@@ -111,6 +112,8 @@ async function createArticle(req, res) {
 }
 
 async function publishArticle(req, res) {
+  await validateArticleMediaLicenses(req.params.id);
+
   const article = await prisma.article.update({
     where: { id: req.params.id },
     data: {

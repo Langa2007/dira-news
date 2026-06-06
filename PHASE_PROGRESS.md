@@ -165,3 +165,34 @@ Latest verified checks:
 - Recursive `node --check` over project backend JavaScript files, excluding `node_modules`: passed.
 - `prisma validate` with root `.env` loaded into the command environment: passed.
 - Recommendation route import smoke test with root `.env` loaded into the command environment: passed.
+
+## Phase 5: Editorial Backend
+
+Status: Done
+
+- [x] Story cluster review
+- [x] Article versioning
+- [x] Editorial comments
+- [x] Source evidence attachment
+- [x] Claim review status
+- [x] Media licensing checks
+- [x] Scheduled publish
+- [x] Corrections workflow
+- [x] AI assistant endpoints
+- [x] Editorial route import smoke test
+- [x] Prisma schema validation
+- [x] Recursive backend JavaScript syntax check
+
+Evidence:
+
+- `backend/services/editorialService.js`
+- `backend/controllers/editorialController.js`
+- `backend/routes/editorialRoutes.js`
+- `backend/routes/index.js`
+- `backend/controllers/articleController.js`
+
+Latest verified checks:
+
+- Recursive `node --check` over project backend JavaScript files, excluding `node_modules`: passed.
+- `prisma validate` with root `.env` loaded into the command environment: passed.
+- Editorial route and main route import smoke test with root `.env` loaded into the command environment: passed.

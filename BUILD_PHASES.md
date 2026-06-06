@@ -188,19 +188,21 @@ Build:
 
 ## Phase 5: Editorial Backend
 
+Status: Done
+
 Goal: make admin workflows backend-native before building the admin UI.
 
 Build:
 
-- story cluster review
-- article versioning
-- editorial comments
-- source evidence attachment
-- claim review status
-- media licensing checks
-- scheduled publish
-- corrections workflow
-- AI assistant endpoints
+- [x] story cluster review
+- [x] article versioning
+- [x] editorial comments
+- [x] source evidence attachment
+- [x] claim review status
+- [x] media licensing checks
+- [x] scheduled publish
+- [x] corrections workflow
+- [x] AI assistant endpoints
 
 ## Phase 6: Publishing And Channels
 

@@ -11,6 +11,7 @@ import aiOutputRoutes from './aiOutputRoutes.js';
 import mediaRoutes from './mediaRoutes.js';
 import socialDraftRoutes from './socialDraftRoutes.js';
 import recommendationRoutes from './recommendationRoutes.js';
+import editorialRoutes from './editorialRoutes.js';
 
 const router = express.Router();
 
@@ -26,5 +27,6 @@ router.use('/ai-outputs', aiOutputRoutes);
 router.use('/media', mediaRoutes);
 router.use('/social-drafts', socialDraftRoutes);
 router.use('/recommendations', recommendationRoutes);
+router.use('/editorial', editorialRoutes);
 
 export default router;
