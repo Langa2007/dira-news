@@ -13,7 +13,7 @@ function cleanJsonObject(value) {
 }
 
 function publicBaseUrl() {
-  return env.PUBLIC_SITE_URL || env.CLIENT_ORIGIN || 'http://localhost:3000';
+  return env.PUBLIC_SITE_URL || env.CLIENT_ORIGIN;
 }
 
 function articleUrl(article) {

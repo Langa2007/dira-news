@@ -32,6 +32,8 @@ function parseOrigins() {
     process.env.CLIENT_ORIGIN,
     process.env.ADMIN_ORIGIN,
     process.env.PUBLIC_SITE_URL,
+    process.env.USER_FRONTEND_URL,
+    process.env.ADMIN_FRONTEND_URL,
     ...(process.env.CLIENT_ORIGINS || '')
       .split(',')
       .map((origin) => origin.trim())
@@ -44,10 +46,10 @@ function parseOrigins() {
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 4000),
-  CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
-  ADMIN_ORIGIN: process.env.ADMIN_ORIGIN || 'http://localhost:3001',
+  CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || process.env.USER_FRONTEND_URL || 'http://localhost:3000',
+  ADMIN_ORIGIN: process.env.ADMIN_ORIGIN || process.env.ADMIN_FRONTEND_URL || 'http://localhost:3001',
   CORS_ORIGINS: parseOrigins(),
-  PUBLIC_SITE_URL: process.env.PUBLIC_SITE_URL || process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+  PUBLIC_SITE_URL: process.env.PUBLIC_SITE_URL || process.env.USER_FRONTEND_URL || process.env.CLIENT_ORIGIN || 'http://localhost:3000',
   DATABASE_URL: database.url,
   DATABASE_TARGET: database.target,
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
