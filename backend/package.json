@@ -5,9 +5,13 @@
   "type": "module",
   "description": "Dira News backend engine in JavaScript.",
   "main": "index.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
+    "build": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
