@@ -1,6 +1,7 @@
 {
   "type": "module",
   "scripts": {
+    "admin:create": "node createadmin.js",
     "db:init": "node db-init.js",
     "db:init:reset": "node db-init.js --reset",
     "db:sync": "node sync-db.js"
