@@ -29,6 +29,7 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 4000),
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+  PUBLIC_SITE_URL: process.env.PUBLIC_SITE_URL || process.env.CLIENT_ORIGIN || 'http://localhost:3000',
   DATABASE_URL: process.env.DATABASE_URL,
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'development-only-change-me',

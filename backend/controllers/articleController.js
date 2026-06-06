@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import prisma from '../models/prisma.js';
 import { recordAudit } from '../services/auditService.js';
-import { emitRealtime } from '../services/realtimeService.js';
-import { addJob, QUEUE_NAMES } from '../services/queueService.js';
-import { validateArticleMediaLicenses } from '../services/editorialService.js';
+import { publishArticleToChannels } from '../services/publishingService.js';
 import { getRankedHotNews } from '../services/recommendationService.js';
 import { makeSlug } from '../utils/slug.js';
 
@@ -112,51 +110,12 @@ async function createArticle(req, res) {
 }
 
 async function publishArticle(req, res) {
-  await validateArticleMediaLicenses(req.params.id);
-
-  const article = await prisma.article.update({
-    where: { id: req.params.id },
-    data: {
-      status: 'PUBLISHED',
-      editorId: req.user.id,
-      publishedAt: new Date(),
-      publishTargets: {
-        create: [
-          { type: 'WEBSITE', status: 'PUBLISHED', publishedAt: new Date() },
-          { type: 'APP_FEED', status: 'PUBLISHED', publishedAt: new Date() },
-          { type: 'TELEGRAM', status: 'QUEUED' },
-          { type: 'WHATSAPP_DRAFT', status: 'QUEUED' },
-          { type: 'INSTAGRAM_DRAFT', status: 'QUEUED' },
-          { type: 'X_DRAFT', status: 'QUEUED' }
-        ]
-      }
-    },
-    include: {
-      publishTargets: true
-    }
+  const result = await publishArticleToChannels({
+    articleId: req.params.id,
+    actorId: req.user.id
   });
 
-  await addJob(QUEUE_NAMES.PUBLISHING, 'publish-approved-article', {
-    articleId: article.id
-  });
-
-  emitRealtime('article.published', {
-    id: article.id,
-    slug: article.slug,
-    title: article.title,
-    category: article.category,
-    isBreaking: article.isBreaking,
-    publishedAt: article.publishedAt
-  });
-
-  await recordAudit({
-    actorId: req.user.id,
-    action: 'article.publish',
-    entity: 'Article',
-    entityId: article.id
-  });
-
-  res.json({ article });
+  res.json(result);
 }
 
 async function uniqueSlug(baseSlug) {

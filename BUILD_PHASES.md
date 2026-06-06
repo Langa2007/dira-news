@@ -206,19 +206,21 @@ Build:
 
 ## Phase 6: Publishing And Channels
 
+Status: Done
+
 Goal: publish from one approved article source of truth.
 
 Build:
 
-- website publish target
-- app feed publish target
-- Telegram publishing worker
-- WhatsApp draft queue
-- Instagram draft queue
-- X draft queue
-- RSS generator
-- sitemap generator
-- publish logs
+- [x] website publish target
+- [x] app feed publish target
+- [x] Telegram publishing worker
+- [x] WhatsApp draft queue
+- [x] Instagram draft queue
+- [x] X draft queue
+- [x] RSS generator
+- [x] sitemap generator
+- [x] publish logs
 
 ## Phase 7: Public Website
 

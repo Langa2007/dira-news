@@ -196,3 +196,35 @@ Latest verified checks:
 - Recursive `node --check` over project backend JavaScript files, excluding `node_modules`: passed.
 - `prisma validate` with root `.env` loaded into the command environment: passed.
 - Editorial route and main route import smoke test with root `.env` loaded into the command environment: passed.
+
+## Phase 6: Publishing And Channels
+
+Status: Done
+
+- [x] Website publish target
+- [x] App feed publish target
+- [x] Telegram publishing worker
+- [x] WhatsApp draft queue
+- [x] Instagram draft queue
+- [x] X draft queue
+- [x] RSS generator
+- [x] Sitemap generator
+- [x] Publish logs
+- [x] Publishing route import smoke test
+- [x] Prisma schema validation
+- [x] Recursive backend JavaScript syntax check
+
+Evidence:
+
+- `backend/services/publishingService.js`
+- `backend/controllers/publishingController.js`
+- `backend/routes/publishingRoutes.js`
+- `backend/routes/index.js`
+- `backend/controllers/articleController.js`
+- `backend/config/env.js`
+
+Latest verified checks:
+
+- Recursive `node --check` over project backend JavaScript files, excluding `node_modules`: passed.
+- `prisma validate` with root `.env` loaded into the command environment: passed.
+- Publishing route and main route import smoke test with root `.env` loaded into the command environment: passed.
