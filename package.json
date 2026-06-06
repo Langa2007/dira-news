@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "scripts": {
+    "db:init": "node db-init.js",
+    "db:init:reset": "node db-init.js --reset",
+    "db:sync": "node sync-db.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

@@ -251,19 +251,30 @@ Build:
 
 ## Phase 8: Admin Panel Frontend
 
+Status: Done
+
 Goal: give editors a serious newsroom interface.
+
+Tech:
+
+- Next.js
+- React
+- JavaScript
+- Tailwind CSS
+- Lucide icons
+- Standalone `admin/` app
 
 Build:
 
-- source monitor
-- story clusters
-- AI briefing panel
-- verification desk
-- article editor
-- media library
-- social draft queue
-- Telegram controls
-- analytics
+- [x] source monitor
+- [x] story clusters
+- [x] AI briefing panel
+- [x] verification desk
+- [x] article editor
+- [x] media library
+- [x] social draft queue
+- [x] Telegram controls
+- [x] analytics
 
 ## Phase 9: Mobile App
 

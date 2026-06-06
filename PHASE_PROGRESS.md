@@ -277,3 +277,46 @@ Latest verified checks:
 - `npm run lint` in `frontend`: passed.
 - `npm run build` in `frontend`: passed.
 - Local frontend HTTP response at `http://localhost:3000`: passed.
+
+## Phase 8: Admin Panel Frontend
+
+Status: Done
+
+Tech:
+
+- Next.js
+- React
+- JavaScript
+- Tailwind CSS
+- Lucide icons
+- Standalone `admin/` app
+
+- [x] Admin folder scaffolded
+- [x] Source monitor
+- [x] Story clusters
+- [x] AI briefing panel
+- [x] Verification desk
+- [x] Article editor
+- [x] Media library
+- [x] Social draft queue
+- [x] Telegram controls
+- [x] Analytics
+- [x] Admin lint check
+- [x] Admin production build
+- [x] Public frontend lint/build after moving admin out
+
+Evidence:
+
+- `admin/src/app/page.js`
+- `admin/src/app/layout.js`
+- `admin/src/app/globals.css`
+- `admin/src/components/AdminWorkspace.js`
+- `admin/src/lib/adminApi.js`
+- `admin/package.json`
+
+Latest verified checks:
+
+- `npm run lint` in `admin`: passed.
+- `npm run build` in `admin`: passed.
+- `npm run lint` in `frontend` after removing temporary admin route: passed.
+- `npm run build` in `frontend` after removing temporary admin route: passed.

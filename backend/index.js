@@ -44,4 +44,5 @@ app.use(errorHandler);
 
 server.listen(env.PORT, () => {
   console.log(`Dira News backend running on http://localhost:${env.PORT}`);
+  console.log(`Database target: ${env.DATABASE_TARGET}`);
 });
