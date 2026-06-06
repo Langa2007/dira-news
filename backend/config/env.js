@@ -28,6 +28,10 @@ if (!isProduction && !process.env.JWT_ACCESS_SECRET) {
 }
 
 function parseOrigins() {
+  function normalizeOrigin(origin) {
+    return origin.trim().replace(/\/$/, '');
+  }
+
   const origins = [
     process.env.CLIENT_ORIGIN,
     process.env.ADMIN_ORIGIN,
@@ -36,9 +40,11 @@ function parseOrigins() {
     process.env.ADMIN_FRONTEND_URL,
     ...(process.env.CLIENT_ORIGINS || '')
       .split(',')
-      .map((origin) => origin.trim())
+      .map(normalizeOrigin)
       .filter(Boolean)
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .map(normalizeOrigin);
 
   return [...new Set(origins.length ? origins : ['http://localhost:3000', 'http://localhost:3001'])];
 }
