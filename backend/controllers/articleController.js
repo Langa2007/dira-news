@@ -3,6 +3,7 @@ import prisma from '../models/prisma.js';
 import { recordAudit } from '../services/auditService.js';
 import { emitRealtime } from '../services/realtimeService.js';
 import { addJob, QUEUE_NAMES } from '../services/queueService.js';
+import { getRankedHotNews } from '../services/recommendationService.js';
 import { makeSlug } from '../utils/slug.js';
 
 const categoryValues = ['LOCAL', 'WORLD', 'POLITICS', 'BUSINESS', 'TECHNOLOGY', 'SPORTS', 'ENTERTAINMENT', 'HEALTH', 'EDUCATION', 'OPINION'];
@@ -42,20 +43,20 @@ async function listArticles(req, res) {
 }
 
 async function listHotNews(req, res) {
-  const [localHotNews, worldHotNews] = await Promise.all([
-    prisma.article.findMany({
-      where: { status: 'PUBLISHED', category: 'LOCAL' },
-      orderBy: [{ isBreaking: 'desc' }, { publishedAt: 'desc' }],
-      take: 10
-    }),
-    prisma.article.findMany({
-      where: { status: 'PUBLISHED', category: 'WORLD' },
-      orderBy: [{ isBreaking: 'desc' }, { publishedAt: 'desc' }],
-      take: 10
-    })
-  ]);
+  const [localResult, worldResult] = await Promise.all([getRankedHotNews('local', { limit: 10 }), getRankedHotNews('world', { limit: 10 })]);
+  const serialize = (items) =>
+    items.map((item) => ({
+      ...item.article,
+      recommendation: {
+        score: item.score,
+        signals: item.signals
+      }
+    }));
 
-  res.json({ localHotNews, worldHotNews });
+  res.json({
+    localHotNews: serialize(localResult.feed),
+    worldHotNews: serialize(worldResult.feed)
+  });
 }
 
 async function createArticle(req, res) {

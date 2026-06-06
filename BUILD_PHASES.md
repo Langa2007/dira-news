@@ -171,18 +171,20 @@ Build:
 
 ## Phase 4: Recommendation Algorithm
 
+Status: Done
+
 Goal: create backend feed intelligence before frontend design.
 
 Build:
 
-- user event tracking
-- topic affinity scoring
-- location preference scoring
-- local hot news ranking
-- world hot news ranking
-- personalized feed ranking
-- diversity controls
-- recommendation refresh jobs
+- [x] user event tracking
+- [x] topic affinity scoring
+- [x] location preference scoring
+- [x] local hot news ranking
+- [x] world hot news ranking
+- [x] personalized feed ranking
+- [x] diversity controls
+- [x] recommendation refresh jobs
 
 ## Phase 5: Editorial Backend
 

@@ -1,6 +1,6 @@
 # Dira News Phase Progress
 
-Last updated: 2026-06-05
+Last updated: 2026-06-06
 
 Rule: a build item is marked done only when the code exists and the relevant checks pass. We do not move to the next phase until all required builds in the current phase are done without known errors.
 
@@ -136,3 +136,32 @@ Latest verified checks:
 - `python -m unittest discover -s python/ai_core/tests -p "test_*.py"`: passed, 7 tests.
 - `python -m unittest discover -s python/acquisition/tests -p "test_*.py"`: passed, 8 tests.
 - Recursive backend JavaScript syntax check: passed.
+
+## Phase 4: Recommendation Algorithm
+
+Status: Done
+
+- [x] User event tracking
+- [x] Topic affinity scoring
+- [x] Location preference scoring
+- [x] Local hot news ranking
+- [x] World hot news ranking
+- [x] Personalized feed ranking
+- [x] Diversity controls
+- [x] Recommendation refresh jobs
+- [x] Recommendation route import smoke test
+- [x] Prisma schema validation
+- [x] Recursive backend JavaScript syntax check
+
+Evidence:
+
+- `backend/services/recommendationService.js`
+- `backend/controllers/recommendationController.js`
+- `backend/routes/recommendationRoutes.js`
+- `backend/controllers/articleController.js`
+
+Latest verified checks:
+
+- Recursive `node --check` over project backend JavaScript files, excluding `node_modules`: passed.
+- `prisma validate` with root `.env` loaded into the command environment: passed.
+- Recommendation route import smoke test with root `.env` loaded into the command environment: passed.
