@@ -224,19 +224,30 @@ Build:
 
 ## Phase 7: Public Website
 
+Status: Done
+
 Goal: connect frontend to real backend data.
+
+Tech:
+
+- Next.js
+- React
+- JavaScript
+- Tailwind CSS
+- Socket.IO client
+- Lucide icons
 
 Build:
 
-- local hot news
-- world hot news
-- latest news
-- categories
-- article pages
-- signup/login
-- preference popup
-- personalized feed
-- realtime breaking news
+- [x] local hot news
+- [x] world hot news
+- [x] latest news
+- [x] categories
+- [x] article pages
+- [x] signup/login
+- [x] preference popup
+- [x] personalized feed
+- [x] realtime breaking news
 
 ## Phase 8: Admin Panel Frontend
 

@@ -228,3 +228,52 @@ Latest verified checks:
 - Recursive `node --check` over project backend JavaScript files, excluding `node_modules`: passed.
 - `prisma validate` with root `.env` loaded into the command environment: passed.
 - Publishing route and main route import smoke test with root `.env` loaded into the command environment: passed.
+
+## Phase 7: Public Website
+
+Status: Done
+
+Tech:
+
+- Next.js
+- React
+- JavaScript
+- Tailwind CSS
+- Socket.IO client
+- Lucide icons
+
+- [x] Frontend folder scaffolded
+- [x] JavaScript app structure
+- [x] Dira editorial visual system
+- [x] Local hot news
+- [x] World hot news
+- [x] Latest news
+- [x] Categories
+- [x] Article pages
+- [x] Signup/login
+- [x] Preference popup
+- [x] Personalized feed
+- [x] Realtime breaking news
+- [x] RSS and sitemap frontend routes
+- [x] Frontend lint check
+- [x] Frontend production build
+
+Evidence:
+
+- `frontend/src/app/page.js`
+- `frontend/src/app/categories/[category]/page.js`
+- `frontend/src/app/articles/[slug]/page.js`
+- `frontend/src/app/feed/page.js`
+- `frontend/src/app/login/page.js`
+- `frontend/src/app/signup/page.js`
+- `frontend/src/app/globals.css`
+- `frontend/src/lib/api.js`
+- `frontend/src/components/BreakingTicker.js`
+- `frontend/src/components/PreferencePrompt.js`
+- `frontend/src/components/PersonalizedFeed.js`
+
+Latest verified checks:
+
+- `npm run lint` in `frontend`: passed.
+- `npm run build` in `frontend`: passed.
+- Local frontend HTTP response at `http://localhost:3000`: passed.
