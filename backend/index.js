@@ -11,9 +11,18 @@ import routes from './routes/index.js';
 
 const app = express();
 const server = http.createServer(app);
+const corsOrigin = (origin, callback) => {
+  if (!origin || env.CORS_ORIGINS.includes('*') || env.CORS_ORIGINS.includes(origin)) {
+    callback(null, true);
+    return;
+  }
+
+  callback(new Error(`Origin not allowed by CORS: ${origin}`));
+};
+
 const io = new Server(server, {
   cors: {
-    origin: env.CLIENT_ORIGIN,
+    origin: corsOrigin,
     credentials: true
   }
 });
@@ -31,7 +40,7 @@ io.on('connection', (socket) => {
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CLIENT_ORIGIN,
+    origin: corsOrigin,
     credentials: true
   })
 );
@@ -45,4 +54,5 @@ app.use(errorHandler);
 server.listen(env.PORT, () => {
   console.log(`Dira News backend running on http://localhost:${env.PORT}`);
   console.log(`Database target: ${env.DATABASE_TARGET}`);
+  console.log(`Allowed origins: ${env.CORS_ORIGINS.join(', ')}`);
 });

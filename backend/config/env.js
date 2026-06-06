@@ -27,10 +27,26 @@ if (!isProduction && !process.env.JWT_ACCESS_SECRET) {
   console.warn('JWT_ACCESS_SECRET is missing. Using a development-only fallback secret.');
 }
 
+function parseOrigins() {
+  const origins = [
+    process.env.CLIENT_ORIGIN,
+    process.env.ADMIN_ORIGIN,
+    process.env.PUBLIC_SITE_URL,
+    ...(process.env.CLIENT_ORIGINS || '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  ].filter(Boolean);
+
+  return [...new Set(origins.length ? origins : ['http://localhost:3000', 'http://localhost:3001'])];
+}
+
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 4000),
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+  ADMIN_ORIGIN: process.env.ADMIN_ORIGIN || 'http://localhost:3001',
+  CORS_ORIGINS: parseOrigins(),
   PUBLIC_SITE_URL: process.env.PUBLIC_SITE_URL || process.env.CLIENT_ORIGIN || 'http://localhost:3000',
   DATABASE_URL: database.url,
   DATABASE_TARGET: database.target,
