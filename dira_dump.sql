@@ -752,6 +752,7 @@ COPY public."PublishTarget" (id, "articleId", type, status, "externalId", payloa
 --
 
 COPY public."RecommendationProfile" (id, "userId", "topicWeights", "regionWeights", "lastRefreshedAt", "createdAt", "updatedAt") FROM stdin;
+profile-admin-e7490f1d35e0c9a0c24ab15f	user-admin-e7490f1d35e0c9a0c24ab15f	{}	\N	\N	2026-06-06 20:47:57.095	2026-06-06 20:47:57.095
 \.
 
 
@@ -870,6 +871,7 @@ topic-opinion	Opinion	opinion	\N	OPINION	2026-06-06 20:00:54.616
 --
 
 COPY public."User" (id, email, name, "passwordHash", status, "emailVerifiedAt", "createdAt", "updatedAt") FROM stdin;
+user-admin-e7490f1d35e0c9a0c24ab15f	fidellanga67@gmail.com	Admin	$2a$12$M4ee87cgpYDcjRgrX0QokeSne/VXyt9CGYgz/fApeHOdrUhbZeV2q	ACTIVE	2026-06-06 20:47:57.095	2026-06-06 20:47:57.095	2026-06-06 20:47:57.095
 \.
 
 
@@ -894,6 +896,7 @@ COPY public."UserPreference" (id, "userId", "topicId", "regionId", weight, "crea
 --
 
 COPY public."UserRole" ("userId", "roleId", "createdAt") FROM stdin;
+user-admin-e7490f1d35e0c9a0c24ab15f	role-admin	2026-06-06 20:47:57.095
 \.
 
 

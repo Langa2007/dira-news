@@ -97,12 +97,11 @@ function localConnectionEnv(config = readDatabaseConfig().local) {
 }
 
 function localDatabaseUrl(config = readDatabaseConfig().local) {
-  const database = encodeURIComponent(config.database);
   const user = encodeURIComponent(config.user);
   const password = encodeURIComponent(config.password);
   const schema = encodeURIComponent(config.schema || 'public');
 
-  return `postgresql://${user}:${password}@${config.host}:${config.port}/${database}?schema=${schema}`;
+  return `postgresql://${user}:${password}@${config.host}:${config.port}/${config.database}?schema=${schema}`;
 }
 
 function backendDatabaseUrl(target = process.env.DB_TARGET || 'auto') {
