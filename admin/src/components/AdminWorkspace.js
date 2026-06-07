@@ -255,6 +255,29 @@ export default function AdminWorkspace() {
               <RefreshCw size={16} aria-hidden="true" />
               Refresh
             </button>
+            {typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? (
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={async () => {
+                  const saved = window.localStorage.getItem('dira-access-token');
+                  // eslint-disable-next-line no-console
+                  console.log('Stored token:', saved);
+                  try {
+                    const me = await adminRequest('/auth/me', { token: saved });
+                    // eslint-disable-next-line no-console
+                    console.log('/auth/me', me);
+                    setStatus({ loading: false, message: 'Auth check OK', error: '' });
+                  } catch (err) {
+                    // eslint-disable-next-line no-console
+                    console.error('Auth check failed', err);
+                    setStatus({ loading: false, message: 'Auth check failed', error: err.message });
+                  }
+                }}
+              >
+                Debug auth
+              </button>
+            ) : null}
             <button
               className="secondary-button"
               type="button"
@@ -268,7 +291,38 @@ export default function AdminWorkspace() {
                   return;
                 }
 
-                await action('Refreshing pipeline', () => adminRequest('/admin/pipeline/refresh', { method: 'POST', token }));
+                setStatus({ loading: true, message: 'Starting pipeline...', error: '' });
+
+                try {
+                  const resp = await adminRequest('/admin/pipeline/refresh', { method: 'POST', token });
+                  const jobId = resp.jobId;
+
+                  setStatus({ loading: true, message: `Pipeline started (job ${jobId}). Monitoring...`, error: '' });
+
+                  // poll status every 2s until completed/failed
+                  const poll = async () => {
+                    try {
+                      const s = await adminRequest('/admin/pipeline/status', { method: 'GET', token });
+                      const job = s.jobs.find((j) => j.id === jobId);
+                      if (!job) {
+                        setStatus({ loading: false, message: `Pipeline job ${jobId} not found`, error: '' });
+                        return;
+                      }
+
+                      if (job.status === 'running' || job.status === 'queued') {
+                        setTimeout(poll, 2000);
+                      } else {
+                        setStatus({ loading: false, message: `Pipeline ${job.status} (job ${jobId})`, error: '' });
+                      }
+                    } catch (err) {
+                      setStatus({ loading: false, message: 'Pipeline monitoring failed', error: err.message });
+                    }
+                  };
+
+                  poll();
+                } catch (err) {
+                  setStatus({ loading: false, message: 'Failed to start pipeline', error: err.message });
+                }
               }}
             >
               <Newspaper size={16} aria-hidden="true" />

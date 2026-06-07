@@ -1,4 +1,8 @@
-const API_BASE_URL = 'https://dira-news.onrender.com/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:4000/api'
+    : 'https://dira-news.onrender.com/api');
 
 async function parseResponse(response) {
   const text = await response.text();
