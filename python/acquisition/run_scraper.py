@@ -10,6 +10,10 @@ from .models import ExtractedDocument
 from .rss import parse_rss
 from .utils import text_hash
 from .worker import SourceAcquisitionWorker, SourceConfig
+import json
+import re
+
+from pathlib import Path
 
 JsonObject = dict[str, Any]
 FETCH_TIMEOUT_SECONDS = 10
@@ -207,7 +211,69 @@ def main() -> None:
         raise RuntimeError("Missing admin credentials in .env.")
 
     client = BackendClient.login(api_base_url(env), email, password)
-    sources = choose_sources(client.list_sources(), args.source_id, args.limit)
+    # Merge backend sources with local registry so scraper includes local news
+    backend_sources = client.list_sources()
+
+    # Try to load JS registry at project root `data/sourceRegistry.js`
+    def load_registry_js(js_path: Path) -> list[JsonObject]:
+        if not js_path.exists():
+            return []
+
+        raw = js_path.read_text(encoding="utf-8")
+        start = raw.find("[")
+        end = raw.rfind("]")
+
+        if start == -1 or end == -1 or end <= start:
+            return []
+
+        arr_text = raw[start : end + 1]
+
+        # Quote unquoted keys: key: -> "key":
+        arr_text = re.sub(r"(?P<k>\b[a-zA-Z_][a-zA-Z0-9_]*\b)\s*:", r'"\g<k>":', arr_text)
+        # Convert single quotes to double quotes
+        arr_text = arr_text.replace("'", '"')
+        # Remove trailing commas before } or ]
+        arr_text = re.sub(r",\s*([}\]])", r"\1", arr_text)
+
+        try:
+            return json.loads(arr_text)
+        except Exception:
+            return []
+
+    repo_root = Path(__file__).resolve().parents[2]
+    registry_path = repo_root / "data" / "sourceRegistry.js"
+    registry = load_registry_js(registry_path)
+
+    # Create registry sources in backend if missing
+    for item in registry:
+        hp = str(item.get("homepageUrl") or "").strip()
+        feed = str(item.get("feedUrl") or "").strip()
+        exists = any(
+            (s.get("homepageUrl") and str(s.get("homepageUrl")).strip() == hp) or
+            (s.get("feedUrl") and str(s.get("feedUrl")).strip() == feed)
+            for s in backend_sources
+        )
+
+        if not exists:
+            payload: JsonObject = {
+                "name": item.get("name") or item.get("group") or "registry-source",
+                "type": item.get("type") or "STATIC_PAGE",
+                "credibilityScore": item.get("credibilityScore") or 0.5,
+                "category": item.get("category") or "LOCAL",
+            }
+
+            if feed:
+                payload["feedUrl"] = feed
+            elif hp:
+                payload["homepageUrl"] = hp
+
+            try:
+                created = client.create_source(payload)
+                backend_sources.append(created)
+            except Exception as exc:
+                print(f"Failed creating registry source {payload.get('name')}: {exc}", flush=True)
+
+    sources = choose_sources(backend_sources, args.source_id, args.limit)
 
     if not sources:
         sources = [ensure_source(client, env, args.source_id)]
