@@ -80,9 +80,18 @@ async function register(req, res) {
     entityId: user.id
   });
 
+  const token = signAccessToken(user);
+
+  res.cookie('dira-access-token', token, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  });
+
   res.status(201).json({
     user: sanitizeUser(user),
-    accessToken: signAccessToken(user)
+    accessToken: token
   });
 }
 
@@ -114,10 +123,33 @@ async function login(req, res) {
     entityId: user.id
   });
 
+  const token = signAccessToken(user);
+
+  // Set token as an HTTP-only cookie so clients send it automatically
+  res.cookie('dira-access-token', token, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  });
+
   res.json({
     user: sanitizeUser(user),
-    accessToken: signAccessToken(user)
+    accessToken: token
   });
+}
+
+async function logout(req, res) {
+  try {
+    res.clearCookie('dira-access-token', {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
+    return res.json({ message: 'Logged out' });
+  } catch (err) {
+    return res.status(500).json({ error: { message: 'Failed to logout' } });
+  }
 }
 
 async function me(req, res) {
@@ -135,4 +167,4 @@ function sanitizeUser(user) {
   };
 }
 
-export { register, login, me };
+export { register, login, me, logout };

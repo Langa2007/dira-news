@@ -6,11 +6,25 @@ async function requireAuth(req, res, next) {
   try {
     const header = req.headers.authorization;
 
-    if (!header || !header.startsWith('Bearer ')) {
+    let token = null;
+
+    if (header && header.startsWith('Bearer ')) {
+      token = header.slice('Bearer '.length);
+    } else if (req.headers.cookie) {
+      const cookies = Object.fromEntries(
+        req.headers.cookie.split(';').map((c) => {
+          const [k, ...v] = c.split('=');
+          return [k.trim(), decodeURIComponent(v.join('='))];
+        })
+      );
+
+      token = cookies['dira-access-token'] || cookies['dira_access_token'] || null;
+    }
+
+    if (!token) {
       return res.status(401).json({ error: { message: 'Missing bearer token', statusCode: 401 } });
     }
 
-    const token = header.slice('Bearer '.length);
     const payload = jwt.verify(token, env.JWT_ACCESS_SECRET);
     const user = await prisma.user.findUnique({
       where: { id: payload.sub },

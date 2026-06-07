@@ -16,16 +16,15 @@ async function parseResponse(response) {
 }
 
 export async function adminRequest(path, options = {}) {
-  const token = options.token || (typeof window !== 'undefined' ? window.localStorage.getItem('dira-access-token') : null);
   const headers = {
     ...(options.body ? { 'content-type': 'application/json' } : {}),
-    ...(token ? { authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {})
   };
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method || 'GET',
     headers,
+    credentials: 'include',
     body: options.body ? JSON.stringify(options.body) : undefined
   });
 

@@ -106,7 +106,7 @@ function singularKey(key) {
 
 export default function AdminWorkspace() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [token, setToken] = useState(() => (typeof window !== 'undefined' ? window.localStorage.getItem('dira-access-token') || '' : ''));
+  const [token, setToken] = useState(false);
   const [data, setData] = useState(initialData);
   const [status, setStatus] = useState({ loading: true, message: 'Loading newsroom state...', error: '' });
   const [selectedArticleId, setSelectedArticleId] = useState('');
@@ -191,10 +191,9 @@ export default function AdminWorkspace() {
         email: form.get('email'),
         password: form.get('password')
       });
-      const accessToken = response.accessToken;
-      window.localStorage.setItem('dira-access-token', accessToken);
-      setToken(accessToken);
-      await loadWorkspace(accessToken);
+      // Server sets HTTP-only cookie; mark as authenticated locally
+      setToken(true);
+      await loadWorkspace();
     } catch (error) {
       setStatus({ loading: false, message: 'Sign in failed.', error: error.message });
     }
@@ -260,11 +259,8 @@ export default function AdminWorkspace() {
                 className="secondary-button"
                 type="button"
                 onClick={async () => {
-                  const saved = window.localStorage.getItem('dira-access-token');
-                  // eslint-disable-next-line no-console
-                  console.log('Stored token:', saved);
                   try {
-                    const me = await adminRequest('/auth/me', { token: saved });
+                    const me = await adminRequest('/auth/me');
                     // eslint-disable-next-line no-console
                     console.log('/auth/me', me);
                     setStatus({ loading: false, message: 'Auth check OK', error: '' });
@@ -278,6 +274,24 @@ export default function AdminWorkspace() {
                 Debug auth
               </button>
             ) : null}
+
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={async () => {
+                setStatus({ loading: true, message: 'Signing out...', error: '' });
+                try {
+                  await adminRequest('/auth/logout', { method: 'POST' });
+                  setToken(false);
+                  setData(initialData);
+                  setStatus({ loading: false, message: 'Signed out', error: '' });
+                } catch (err) {
+                  setStatus({ loading: false, message: 'Sign out failed', error: err.message });
+                }
+              }}
+            >
+              Logout
+            </button>
             <button
               className="secondary-button"
               type="button"
