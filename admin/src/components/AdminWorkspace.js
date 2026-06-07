@@ -255,6 +255,25 @@ export default function AdminWorkspace() {
               <RefreshCw size={16} aria-hidden="true" />
               Refresh
             </button>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={async () => {
+                if (!token) {
+                  setStatus({ loading: false, message: 'Please sign in as admin to run pipeline.', error: '' });
+                  return;
+                }
+
+                if (!window.confirm('Run news refresh pipeline now? This will scrape sources and run clustering/drafting.')) {
+                  return;
+                }
+
+                await action('Refreshing pipeline', () => adminRequest('/admin/pipeline/refresh', { method: 'POST', token }));
+              }}
+            >
+              <Newspaper size={16} aria-hidden="true" />
+              Run pipeline
+            </button>
           </div>
         </header>
 

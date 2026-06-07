@@ -13,6 +13,7 @@ import socialDraftRoutes from './socialDraftRoutes.js';
 import recommendationRoutes from './recommendationRoutes.js';
 import editorialRoutes from './editorialRoutes.js';
 import publishingRoutes from './publishingRoutes.js';
+import adminRoutes from './adminRoutes.js';
 
 const router = express.Router();
 
@@ -30,5 +31,6 @@ router.use('/social-drafts', socialDraftRoutes);
 router.use('/recommendations', recommendationRoutes);
 router.use('/editorial', editorialRoutes);
 router.use('/publishing', publishingRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;
