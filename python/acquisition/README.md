@@ -24,3 +24,30 @@ From the project root:
 python -m unittest discover -s python/acquisition/tests -p "test_*.py"
 ```
 
+## One-shot deployed scrape
+
+The runner reads `.env`, logs in with the admin credentials, uses `BACKEND_URL`, and posts extracted documents back to the backend API:
+
+```bash
+python -m python.acquisition.run_scraper
+```
+
+Run only a small batch:
+
+```bash
+python -m python.acquisition.run_scraper --limit 10
+```
+
+Run one source:
+
+```bash
+python -m python.acquisition.run_scraper --source-id SOURCE_ID
+```
+
+If there are no sources yet, add these to `.env`:
+
+```bash
+SCRAPER_SOURCE_URL=https://example.com/news
+SCRAPER_SOURCE_NAME=Example News
+SCRAPER_SOURCE_TYPE=STATIC_PAGE
+```

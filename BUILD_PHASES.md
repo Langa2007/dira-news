@@ -142,6 +142,31 @@ Build:
 - [x] crawl logs
 - [x] fixture-based test suite
 - [x] verification output captured
+- [x] Kenya source registry seed covering official government, legislature, judiciary, parastatal, media, banking, telecom, and international comparator sources
+- [x] deployed backend scraper runner that reads registered sources and posts source documents
+
+Seeded source groups:
+
+- Kenya executive: Office of the President, MyGov, parliamentary affairs, interior, treasury, foreign affairs, defence, health, education, transport, ICT, agriculture, energy, and environment.
+- Kenya legislature and judiciary: Parliament, National Assembly, Senate, Judiciary, and Kenya Law.
+- Kenya parastatals and regulators: KRA, CBK, KNBS, IEBC, CA, Competition Authority, PPRA, NEMA, Kenya Power, KenGen, KETRACO, KPA, KeNHA, KeRRA, KURA, DCI, and EACC.
+- Kenyan media houses: Standard, Capital FM, Nation, Citizen, KBC, Business Daily, The Star, People Daily, and K24.
+- International comparator sources: BBC Africa RSS, Reuters Africa, and CNN Africa.
+- Kenyan banks: Equity, KCB, Co-operative Bank, Absa Kenya, NCBA, Stanbic, Standard Chartered Kenya, I&M, and DTB.
+- Kenyan telcos: Safaricom, Airtel Kenya, Telkom Kenya, and Jamii Telecommunications/Faiba.
+
+Source registry files:
+
+- `data/sourceRegistry.js`
+- `seed-sources.js`
+- `python/acquisition/run_scraper.py`
+
+Run:
+
+```bash
+npm run sources:seed
+python -m python.acquisition.run_scraper --limit 10
+```
 
 ## Phase 3: AI And ML Core
 

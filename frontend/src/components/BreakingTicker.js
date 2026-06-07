@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Radio } from 'lucide-react';
 import { io } from 'socket.io-client';
+import { SOCKET_BASE_URL } from '@/lib/endpoints';
 
-const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+const socketUrl = SOCKET_BASE_URL;
 
 function uniqueStories(stories) {
   const seen = new Set();

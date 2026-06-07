@@ -29,7 +29,7 @@ class ExtractedDocument:
     metadata: dict[str, Any] = field(default_factory=empty_metadata)
 
     def to_backend_payload(self) -> dict[str, Any]:
-        return {
+        payload: dict[str, Any] = {
             "canonicalUrl": self.canonical_url,
             "title": self.title,
             "author": self.author,
@@ -38,6 +38,13 @@ class ExtractedDocument:
             "textHash": self.text_hash,
             "metadata": self.metadata,
         }
+        cleaned: dict[str, Any] = {}
+
+        for key, value in payload.items():
+            if value is not None:
+                cleaned[key] = value
+
+        return cleaned
 
 
 @dataclass(frozen=True)

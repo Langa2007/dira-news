@@ -16,9 +16,15 @@ class SourceConfig:
 
 
 class SourceAcquisitionWorker:
-    def __init__(self, rate_limiter: DomainRateLimiter | None = None, user_agent: str = "DiraNewsBot"):
+    def __init__(
+        self,
+        rate_limiter: DomainRateLimiter | None = None,
+        user_agent: str = "DiraNewsBot",
+        timeout_seconds: int = 10,
+    ):
         self.rate_limiter = rate_limiter or DomainRateLimiter(interval_seconds=5)
         self.user_agent = user_agent
+        self.timeout_seconds = timeout_seconds
 
     def acquire_static_page(self, source: SourceConfig) -> tuple[ExtractedDocument | None, FetchLog]:
         if source.robots_text:
@@ -31,7 +37,7 @@ class SourceAcquisitionWorker:
 
         try:
             request = Request(source.url, headers={"User-Agent": self.user_agent})
-            with urlopen(request, timeout=20) as response:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
                 body = response.read().decode(response.headers.get_content_charset() or "utf-8", errors="replace")
                 document = extract_static_html(source_id=source.id, url=source.url, html=body)
                 return document, FetchLog(
@@ -49,4 +55,3 @@ def _robots_url(url: str) -> str:
 
     parsed = urlsplit(url)
     return urlunsplit((parsed.scheme, parsed.netloc, "/robots.txt", "", ""))
-

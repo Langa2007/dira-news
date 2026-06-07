@@ -1,7 +1,15 @@
 {
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
+    "build": "npm --prefix backend install && npm --prefix backend run build",
+    "start": "npm --prefix backend start",
     "admin:create": "node createadmin.js",
+    "sources:seed": "node seed-sources-api.js",
+    "sources:seed:db": "node seed-sources.js",
+    "sources:seed:local": "node seed-sources.js --local",
     "db:init": "node db-init.js",
     "db:init:reset": "node db-init.js --reset",
     "db:sync": "node sync-db.js"

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+import { API_BASE_URL } from '@/lib/endpoints';
 
 export default function PersonalizedFeed() {
   const [state, setState] = useState({ status: 'loading', feed: [], message: '' });
