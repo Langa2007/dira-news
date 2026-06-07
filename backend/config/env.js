@@ -32,6 +32,13 @@ function parseOrigins() {
     return origin.trim().replace(/\/$/, '');
   }
 
+  const defaultOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://dira-news.vercel.app',
+    'https://dira-admin-psi.vercel.app'
+  ];
+
   const origins = [
     process.env.CLIENT_ORIGIN,
     process.env.ADMIN_ORIGIN,
@@ -46,7 +53,7 @@ function parseOrigins() {
     .filter(Boolean)
     .map(normalizeOrigin);
 
-  return [...new Set(origins.length ? origins : ['http://localhost:3000', 'http://localhost:3001'])];
+  return [...new Set([...origins, ...defaultOrigins])];
 }
 
 const env = {
