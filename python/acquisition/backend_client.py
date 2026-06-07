@@ -42,6 +42,11 @@ class BackendClient:
         documents = data.get("documents", [])
         return cast(list[JsonObject], documents if isinstance(documents, list) else [])
 
+    def list_all_source_documents(self) -> list[JsonObject]:
+        data = self._request("GET", "/sources/documents")
+        documents = data.get("documents", [])
+        return cast(list[JsonObject], documents if isinstance(documents, list) else [])
+
     def create_source_document(self, source_id: str, document: ExtractedDocument) -> JsonObject:
         return self._request(
             "POST",
@@ -56,6 +61,23 @@ class BackendClient:
             "error": log.error,
         }
         return self._request("PATCH", f"/sources/fetches/{fetch_id}", payload)
+
+    def list_story_clusters(self) -> list[JsonObject]:
+        data = self._request("GET", "/story-clusters")
+        clusters = data.get("clusters", [])
+        return cast(list[JsonObject], clusters if isinstance(clusters, list) else [])
+
+    def create_story_cluster(self, payload: JsonObject) -> JsonObject:
+        data = self._request("POST", "/story-clusters", payload)
+        return cast(JsonObject, data.get("cluster", data))
+
+    def create_ai_output(self, payload: JsonObject) -> JsonObject:
+        data = self._request("POST", "/ai-outputs", payload)
+        return cast(JsonObject, data.get("output", data))
+
+    def create_article(self, payload: JsonObject) -> JsonObject:
+        data = self._request("POST", "/articles", payload)
+        return cast(JsonObject, data.get("article", data))
 
     def _request(self, method: str, path: str, payload: JsonObject | None = None) -> JsonObject:
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
