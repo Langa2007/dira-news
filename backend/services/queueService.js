@@ -10,13 +10,33 @@ const QUEUE_NAMES = {
 };
 
 let connection;
+let redisAvailable = true;
 const queues = {};
 
 function getConnection() {
   if (!connection) {
-    connection = new IORedis(env.REDIS_URL, {
-      maxRetriesPerRequest: null
-    });
+    if (!env.REDIS_URL) {
+      redisAvailable = false;
+      console.warn('REDIS_URL not set; queueing disabled.');
+      return null;
+    }
+
+    try {
+      connection = new IORedis(env.REDIS_URL, {
+        maxRetriesPerRequest: null,
+        // Avoid throwing on first failure; we'll handle errors explicitly
+        enableOfflineQueue: false
+      });
+
+      connection.on('error', (err) => {
+        redisAvailable = false;
+        console.warn('Redis connection error; disabling queues:', String(err && err.message ? err.message : err));
+      });
+    } catch (err) {
+      redisAvailable = false;
+      console.warn('Failed to create Redis connection; queueing disabled.', String(err));
+      connection = null;
+    }
   }
 
   return connection;
@@ -26,11 +46,23 @@ function getQueue(queueName) {
   if (!Object.values(QUEUE_NAMES).includes(queueName)) {
     throw new Error(`Unknown queue: ${queueName}`);
   }
-
   if (!queues[queueName]) {
-    queues[queueName] = new Queue(queueName, {
-      connection: getConnection()
-    });
+    const conn = getConnection();
+
+    if (!redisAvailable || !conn) {
+      // Fallback noop queue to avoid crashes when Redis is unavailable
+      queues[queueName] = {
+        name: queueName,
+        add: async (jobName, data, opts) => {
+          console.warn(`Queue disabled: skipping job ${jobName} on ${queueName}`);
+          return { id: `noop-${Date.now()}` };
+        }
+      };
+    } else {
+      queues[queueName] = new Queue(queueName, {
+        connection: conn
+      });
+    }
   }
 
   return queues[queueName];
